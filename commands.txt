@@ -1,5 +1,5 @@
 mvn clean package
 mvn spring-boot:run
-mvn spring-boot:build-image -Dspring-boot.build-image.imageName=mujeeb/mosque-dashboard-api
-docker build -t mujeeb/mosque-dashboard-api .
-docker run -p 80:80 -t mujeeb/mosque-dashboard-api
+mvn spring-boot:build-image -Dspring-boot.build-image.imageName=mdmujeeb82/mosque-dashboard-api
+docker build -t mdmujeeb82/mosque-dashboard-api .
+docker run -p 80:80 -t mdmujeeb82/mosque-dashboard-api

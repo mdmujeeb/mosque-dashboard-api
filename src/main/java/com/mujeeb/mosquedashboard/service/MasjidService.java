@@ -68,6 +68,10 @@ public class MasjidService {
         }
     }
 
+    public String getMasjidName(int masjidId) {
+        return masjidRepository.findById(masjidId).getDescription();
+    }
+
     public Map<String, String> getNamazTimes(int masjidId) {
 
         return convertToMap(namazTimeRepository.findByMasjidId(masjidId).stream().collect(Collectors.toList()));

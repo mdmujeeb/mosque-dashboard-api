@@ -8,7 +8,8 @@ import com.mujeeb.mosquedashboard.beans.request.NamazTimeUpdateRequestBean;
 import com.mujeeb.mosquedashboard.beans.request.OccasionRequestBean;
 import com.mujeeb.mosquedashboard.beans.request.UpdateRefreshRequiredBean;
 import com.mujeeb.mosquedashboard.beans.response.BaseResponseBean;
-import com.mujeeb.mosquedashboard.entity.*;
+import com.mujeeb.mosquedashboard.entity.Masjid;
+import com.mujeeb.mosquedashboard.entity.Occasion;
 import com.mujeeb.mosquedashboard.repository.*;
 import com.mujeeb.mosquedashboard.service.MasjidService;
 import com.mujeeb.mosquedashboard.util.DateUtil;
@@ -17,11 +18,7 @@ import com.mujeeb.mosquedashboard.util.WeatherUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @RestController
 public class MosqueDashboardController {
@@ -43,6 +40,47 @@ public class MosqueDashboardController {
 
     @Autowired
     private RamzanTimeRepository ramzanTimeRepository;
+
+    @GetMapping(value = "/getDataForMobileApp", produces = "application/json")
+    public Map<String,Object> getDataForMobileApp(@RequestParam String id) {
+
+        int masjidId = 1;
+        // Make sure ID contains a valid integer
+        try {
+            masjidId = Integer.parseInt(id);
+        }catch(Exception ex) {
+            ex.printStackTrace();
+        }
+
+        Map<String,String> namazTimes = getNamazTimes("" + masjidId);
+        TempreatureBean temp = getCurrentTempreature("" + masjidId);
+        DateBean hijriDate = getHijriDate("" + masjidId);
+        List<Occasion> occasions = getOccasions("" + masjidId);
+        String masjidName = getMasjidName("" + masjidId);
+
+        Map<String,Object> returnMap = new HashMap<String,Object>();
+        returnMap.put("namazTimes", namazTimes);
+        returnMap.put("temperature", temp);
+        returnMap.put("hijriDate", hijriDate);
+        returnMap.put("occasions", occasions);
+        returnMap.put("masjidName", masjidName);
+
+        return returnMap;
+    }
+
+    @GetMapping(value = "/getMasjidName", produces = "application/json")
+    public String getMasjidName(@RequestParam String id) {
+
+        int masjidId = 1;
+        // Make sure ID contains a valid integer
+        try {
+            masjidId = Integer.parseInt(id);
+        }catch(Exception ex) {
+            ex.printStackTrace();
+        }
+
+        return masjidService.getMasjidName(masjidId);
+    }
 
     @GetMapping(value = "/getNamazTimes", produces = "application/json")
     public Map<String,String> getNamazTimes(@RequestParam String id) {

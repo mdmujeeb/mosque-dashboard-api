@@ -68,6 +68,32 @@ public class MosqueDashboardController {
         return returnMap;
     }
 
+    @GetMapping(value = "/resetUpdateRefreshRequired", produces = "application/json")
+    public BaseResponseBean resetUpdateRefreshRequired(@RequestParam String id) {
+
+        int masjidId = 1;
+        // Make sure ID contains a valid integer
+        try {
+            masjidId = Integer.parseInt(id);
+        }catch(Exception ex) {
+            ex.printStackTrace();
+        }
+
+        try {
+            boolean result = masjidService.updateNamazTime(masjidId, "REFRESH_REQUIRED", "false");
+
+            if (result) {
+
+                return new BaseResponseBean(0, "Reset Successful.");
+            } else {
+
+                return new BaseResponseBean(2);
+            }
+        }catch(Throwable ex) {
+            return new BaseResponseBean(2);
+        }
+    }
+
     @GetMapping(value = "/getMasjidName", produces = "application/json")
     public String getMasjidName(@RequestParam String id) {
 

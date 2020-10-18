@@ -3,3 +3,4 @@ mvn spring-boot:run
 mvn spring-boot:build-image -Dspring-boot.build-image.imageName=mdmujeeb82/mosque-dashboard-api
 docker build -t mdmujeeb82/mosque-dashboard-api .
 docker run -p 80:80 -t mdmujeeb82/mosque-dashboard-api
+docker push mdmujeeb82/mosque-dashboard-api

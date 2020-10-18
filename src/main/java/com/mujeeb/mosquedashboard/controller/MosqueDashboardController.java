@@ -7,6 +7,7 @@ import com.mujeeb.mosquedashboard.beans.request.BaseRequestBean;
 import com.mujeeb.mosquedashboard.beans.request.NamazTimeUpdateRequestBean;
 import com.mujeeb.mosquedashboard.beans.request.OccasionRequestBean;
 import com.mujeeb.mosquedashboard.beans.request.UpdateRefreshRequiredBean;
+import com.mujeeb.mosquedashboard.beans.response.AddOccasionResponseBean;
 import com.mujeeb.mosquedashboard.beans.response.BaseResponseBean;
 import com.mujeeb.mosquedashboard.entity.Masjid;
 import com.mujeeb.mosquedashboard.entity.Occasion;
@@ -306,10 +307,10 @@ public class MosqueDashboardController {
 
             Date date = DateUtil.parseDate(bean.getDate());
 
-            boolean result = masjidService.addOccasion(masjidId, date, bean.getDescription());
+            String id = masjidService.addOccasion(masjidId, date, bean.getDescription());
 
-            if(result) {
-                return new BaseResponseBean(0, "Occasion was Added Successfully.");
+            if(id != null) {
+                return new AddOccasionResponseBean(0, "Occasion was Added Successfully.", id);
 
             } else {
                 return new BaseResponseBean(5);

@@ -157,16 +157,15 @@ public class MasjidService {
         }
     }
 
-    public boolean addOccasion(int masjidId, Date occasionDate, String description) {
+    public String addOccasion(int masjidId, Date occasionDate, String description) {
 
         try {
-            occasionRepository.save(new Occasion(description, occasionDate, masjidId));
-            return true;
+            return "" + occasionRepository.save(new Occasion(description, occasionDate, masjidId)).getId();
 
         } catch (Exception e) {
 
             e.printStackTrace();
-            return false;
+            return null;
         }
     }
 

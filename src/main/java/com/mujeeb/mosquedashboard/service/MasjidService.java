@@ -1,5 +1,6 @@
 package com.mujeeb.mosquedashboard.service;
 
+import com.google.api.client.util.Lists;
 import com.mujeeb.mosquedashboard.beans.BaseException;
 import com.mujeeb.mosquedashboard.beans.OccasionBean;
 import com.mujeeb.mosquedashboard.entity.Masjid;
@@ -80,6 +81,12 @@ public class MasjidService {
     public List<Occasion> getOccasions(int masjidId) {
 
         return occasionRepository.findByMasjidId(masjidId);
+    }
+
+    public List<String> getMasjidList() {
+
+        return Lists.newArrayList(masjidRepository.findAll()).stream()
+                .map(masjid -> masjid.getDescription()).collect(Collectors.toList());
     }
 
     public Masjid findMasjidByMasjidId(int masjidId) {

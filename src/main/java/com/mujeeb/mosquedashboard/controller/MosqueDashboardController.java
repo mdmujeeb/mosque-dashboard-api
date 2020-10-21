@@ -58,6 +58,7 @@ public class MosqueDashboardController {
         DateBean hijriDate = getHijriDate("" + masjidId);
         List<Occasion> occasions = getOccasions("" + masjidId);
         String masjidName = getMasjidName("" + masjidId);
+        List<String> masjidList = getMasjidList();
 
         Map<String,Object> returnMap = new HashMap<String,Object>();
         returnMap.put("namazTimes", namazTimes);
@@ -65,8 +66,22 @@ public class MosqueDashboardController {
         returnMap.put("hijriDate", hijriDate);
         returnMap.put("occasions", occasions);
         returnMap.put("masjidName", masjidName);
+        returnMap.put("masjidList", masjidList);
 
         return returnMap;
+    }
+
+    @GetMapping(value = "/getMasjidList", produces = "application/json")
+    public List<String> getMasjidList() {
+
+        try {
+            return masjidService.getMasjidList();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new ArrayList<String>();
     }
 
     @GetMapping(value = "/resetUpdateRefreshRequired", produces = "application/json")

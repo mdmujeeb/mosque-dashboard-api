@@ -8,6 +8,7 @@ import com.mujeeb.mosquedashboard.entity.NamazTime;
 import com.mujeeb.mosquedashboard.entity.Occasion;
 import com.mujeeb.mosquedashboard.entity.RamzanTime;
 import com.mujeeb.mosquedashboard.repository.*;
+import com.mujeeb.mosquedashboard.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -118,9 +119,10 @@ public class MasjidService {
         }
     }
 
-    public String getCurrentOccasion(int masjidId) {
-
+    public String getCurrentOccasion(int masjidId, boolean isPostMagrib) {
+        Date date = isPostMagrib ? DateUtil.addDaysToDate(new Date(), 1) : new Date();
         Calendar currentDate = new GregorianCalendar();
+        currentDate.setTime(date);
         try {
             List<Occasion> occasions = occasionRepository.findByMasjidId(masjidId);
             for(Occasion occasion : occasions) {

@@ -204,13 +204,10 @@ public class MosqueDashboardController {
         }
 
         int adjustment = masjidService.getHijriAdjustment(masjidId);
+        boolean isPostMagrib = IslamicUtil.isPostMagrib();
+        adjustment = isPostMagrib ? adjustment+1 : adjustment;
         DateBean date = IslamicUtil.getHijriDate(adjustment);
-	   /*if(adjustment < 0) {
-	   		date.setDate("" + (Integer.parseInt(date.getDate()) - adjustment));
-   	   } else if(adjustment > 0) {
-	   		date.setDate("" + (Integer.parseInt(date.getDate()) + adjustment));
-   	   }*/
-        String occasion = masjidService.getCurrentOccasion(masjidId);
+        String occasion = masjidService.getCurrentOccasion(masjidId, isPostMagrib);
         if(occasion != null) {
 
             date.setYear(occasion);

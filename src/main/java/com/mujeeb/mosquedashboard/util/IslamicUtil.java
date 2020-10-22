@@ -114,10 +114,8 @@ public class IslamicUtil {
 	
 	public static DateBean getHijriDate(int adjustment) {
 		Date date = new Date();
-		
 		date = addDayToDate(date, adjustment);
-		date = checkMagribPassed(date);
-		
+
 		/* Convert current date to Hijri calendar. */
 		SimpleHijriDate hdate = HijriCalc.toHijri(date);
 		
@@ -132,7 +130,7 @@ public class IslamicUtil {
 		return getPrayerTimes(location);
 	}*/
 	
-	private static Date checkMagribPassed(Date date) {
+	public static boolean isPostMagrib() {
 		Map<String,String> hijriNamazTimes = IslamicUtil.getPrayerTimes();
 		String[] magribTime = hijriNamazTimes.get("Maghrib").split(":");
 	   	int hour = -1;
@@ -145,11 +143,14 @@ public class IslamicUtil {
 	   	try {
 	   		minute = Integer.parseInt(magribTime[1]);
 	   	}catch(Exception ex) { /*Do Nothing*/ }
-	   	
-	   	if(date.getHours() > hour || (date.getHours() == hour && date.getMinutes() > minute)) {
-	   		return addDayToDate(date, 1);
+
+	   	Calendar cal = new GregorianCalendar();
+	   	int currentHours = cal.get(Calendar.HOUR_OF_DAY);
+	   	int currentMinutes = cal.get(Calendar.MINUTE);
+	   	if(currentHours > hour || (currentHours == hour && currentMinutes >= minute)) {
+	   		return true;
 	   	} else {
-	   		return date;
+	   		return false;
 	   	}
 	}
 

@@ -12,12 +12,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 
 @SpringBootApplication
-public class MosqueDashboardApplication {
+public class MosqueDashboardApplication extends SpringBootServletInitializer {
 
 	public static String CSV_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSSSSSS";
 	public static final SimpleDateFormat dateFormatter = new SimpleDateFormat(CSV_DATE_FORMAT);

@@ -1,46 +1,52 @@
 package com.mujeeb.mosquedashboard.beans.request;
 
-public class OccasionRequestBean extends BaseRequestBean {
+public class EnquiryRequestBean extends BaseRequestBean {
 
 	private static final long serialVersionUID = 1L;
 
-	private Integer id;
-	private String date;
-	private String description;
+	private String name;
+	private String phone;
+	private String email;
+	private String enquiry;
 	
-	public OccasionRequestBean() {}
-	
-	public OccasionRequestBean(Integer id, String name, String time) {
-		this.id = id;
-		this.date = name;
-		this.description = time;
-	}
+	public EnquiryRequestBean() {}
 
-	public Integer getId() {
-		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
+	public EnquiryRequestBean(String name, String phone, String email, String enquiry) {
+		this.name = name;
+		this.phone = phone;
+		this.email = email;
+		this.enquiry = enquiry;
 	}
 
 	public String getName() {
-		return date;
+		return name;
 	}
 
-	public String getDate() {
-		return date;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public void setDate(String date) {
-		this.date = date;
+	public String getPhone() {
+		return phone;
 	}
 
-	public String getDescription() {
-		return description;
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getEnquiry() {
+		return enquiry;
+	}
+
+	public void setEnquiry(String enquiry) {
+		this.enquiry = enquiry;
 	}
 }

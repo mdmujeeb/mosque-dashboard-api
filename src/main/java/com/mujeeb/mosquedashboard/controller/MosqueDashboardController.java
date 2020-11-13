@@ -1,5 +1,6 @@
 package com.mujeeb.mosquedashboard.controller;
 
+import java.util.*;
 import com.mujeeb.mosquedashboard.beans.BaseException;
 import com.mujeeb.mosquedashboard.beans.DateBean;
 import com.mujeeb.mosquedashboard.beans.TempreatureBean;
@@ -7,6 +8,8 @@ import com.mujeeb.mosquedashboard.beans.request.BaseRequestBean;
 import com.mujeeb.mosquedashboard.beans.request.NamazTimeUpdateRequestBean;
 import com.mujeeb.mosquedashboard.beans.request.OccasionRequestBean;
 import com.mujeeb.mosquedashboard.beans.request.UpdateRefreshRequiredBean;
+import com.mujeeb.mosquedashboard.beans.request.EnquiryRequestBean;
+import com.mujeeb.mosquedashboard.beans.request.OrderRequestBean;
 import com.mujeeb.mosquedashboard.beans.response.AddOccasionResponseBean;
 import com.mujeeb.mosquedashboard.beans.response.BaseResponseBean;
 import com.mujeeb.mosquedashboard.entity.Masjid;
@@ -16,10 +19,10 @@ import com.mujeeb.mosquedashboard.service.MasjidService;
 import com.mujeeb.mosquedashboard.util.DateUtil;
 import com.mujeeb.mosquedashboard.util.IslamicUtil;
 import com.mujeeb.mosquedashboard.util.WeatherUtil;
+import com.mujeeb.mosquedashboard.util.EmailUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.*;
 
 @RestController
 public class MosqueDashboardController {
@@ -367,6 +370,42 @@ public class MosqueDashboardController {
 
             ex.printStackTrace();
             return new BaseResponseBean(6);
+        }
+    }
+
+    @PostMapping(value = "/sendEnquiryEmail", consumes = "application/json", produces="application/json")
+    public BaseResponseBean sendEnquiryEmail(@RequestBody EnquiryRequestBean bean) {
+
+            StringBuilder builder = new StringBuilder("<html>\n");
+            builder.append("Name: ").append(bean.getName()).append("<br>")
+                .append("Phone: ").append(bean.getPhone()).append("<br>")
+                .append("Email: ").append(bean.getEmail()).append("<br>")
+                .append("Enquiry: ").append(bean.getEnquiry()).append("<br>")
+                .append("</html>");
+            if(EmailUtil.sendEMail("Enquiry about Mosque Dashboard", builder.toString())) {
+                return new BaseResponseBean(0, "Enquiry was sent Successfully.");
+            } else {
+                return new BaseResponseBean(4);
+            }
+    }
+
+    @PostMapping(value = "/sendOrderEmail", consumes = "application/json", produces="application/json")
+    public BaseResponseBean sendOrderEmail(@RequestBody OrderRequestBean bean) {
+
+        StringBuilder builder = new StringBuilder("<html>\n");
+        builder.append("Name: ").append(bean.getName()).append("<br>")
+                .append("Phone: ").append(bean.getPhone()).append("<br>")
+                .append("Email: ").append(bean.getEmail()).append("<br>")
+                .append("Address: ").append(bean.getAddress1()).append(", ").append(bean.getAddress2()).append(", ")
+                        .append(bean.getCity()).append(" - ").append(bean.getPinCode()).append(", ").append(bean.getState()).append("<br>")
+                .append("TV: ").append(bean.getTv()).append("<br>")
+                .append("WiFi: ").append(bean.getWifi()).append("<br>")
+                .append("Special Instructions: ").append(bean.getSpecialInstructions()).append("<br>")
+                .append("</html>");
+        if(EmailUtil.sendEMail("New Order - Mosque Dashboard", builder.toString())) {
+            return new BaseResponseBean(0, "Order Email was sent Successfully.");
+        } else {
+            return new BaseResponseBean(4);
         }
     }
 }

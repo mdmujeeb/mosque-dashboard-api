@@ -64,6 +64,8 @@ public abstract class Errors {
 		errorMap.put(53, "Invalid Vehicle Id.");
 		errorMap.put(54, "Order Type cannot be empty.");
 		errorMap.put(55, "Vehicle Id is required for Full Tank Order.");
+		errorMap.put(56, "Invalid QR Code.");
+		errorMap.put(57, "QR Code is disabled.");
 	}
 	
 	public static String getErrorDescription(int errorCode) {

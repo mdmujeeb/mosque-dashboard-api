@@ -10,7 +10,10 @@ import com.mujeeb.mosquedashboard.beans.request.OccasionRequestBean;
 import com.mujeeb.mosquedashboard.beans.request.UpdateRefreshRequiredBean;
 import com.mujeeb.mosquedashboard.beans.request.EnquiryRequestBean;
 import com.mujeeb.mosquedashboard.beans.request.OrderRequestBean;
+import com.mujeeb.mosquedashboard.beans.request.QRCodeUpdateRequestBean;
 import com.mujeeb.mosquedashboard.beans.response.AddOccasionResponseBean;
+import com.mujeeb.mosquedashboard.beans.response.AllQRCodesResponseBean;
+import com.mujeeb.mosquedashboard.beans.response.QRCodeResponseBean;
 import com.mujeeb.mosquedashboard.beans.response.BaseResponseBean;
 import com.mujeeb.mosquedashboard.entity.Masjid;
 import com.mujeeb.mosquedashboard.entity.Occasion;
@@ -373,6 +376,8 @@ public class MosqueDashboardController {
         }
     }
 
+    /***************************** Email Related Methods *****************************/
+
     @PostMapping(value = "/sendEnquiryEmail", consumes = "application/json", produces="application/json")
     public BaseResponseBean sendEnquiryEmail(@RequestBody EnquiryRequestBean bean) {
 
@@ -407,5 +412,133 @@ public class MosqueDashboardController {
         } else {
             return new BaseResponseBean(4);
         }
+    }
+
+    /***************************** Sadaqa Related Methods *****************************/
+    public static final String QR_CODE_PREFIX = "MOHAMMAD.MUJEEB@GMAIL.COM@";
+    private static Map<String,String> qrCodes = new HashMap<String,String>();
+
+    @PostMapping(value = "/enableQRCode", consumes = "application/json", produces="application/json")
+    public BaseResponseBean enableQRCode(@RequestBody QRCodeUpdateRequestBean bean) {
+
+        try {
+            // Make sure ID contains a valid integer
+            int masjidId = 1;
+            try {
+                masjidId = Integer.parseInt(bean.getUserId());
+            }catch(Throwable ex) {
+                throw new BaseException(1);
+            }
+
+            masjidService.authenticateUser(masjidId, bean.getPassword());
+
+            boolean isEnable = "true".equalsIgnoreCase(bean.getEnable());
+
+            if(isEnable) {
+                qrCodes.put(bean.getQrCode(), "true");
+            } else {
+                qrCodes.put(bean.getQrCode(), "false");
+            }
+
+            return new BaseResponseBean(0, "QR Code was " + (isEnable ? "enabled" : "disabled") + " Successfully.");
+
+        } catch(BaseException b) {
+
+            return new BaseResponseBean(b.getReasonCode());
+        } catch(Throwable ex) {
+
+            ex.printStackTrace();
+            return new BaseResponseBean(6);
+        }
+    }
+
+    @PostMapping(value = "/disableALLQRCodes", consumes = "application/json", produces="application/json")
+    public BaseResponseBean disableALLQRCodes(@RequestBody BaseRequestBean bean) {
+
+        try {
+            // Make sure ID contains a valid integer
+            int masjidId = 1;
+            try {
+                masjidId = Integer.parseInt(bean.getUserId());
+            }catch(Throwable ex) {
+                throw new BaseException(1);
+            }
+
+            masjidService.authenticateUser(masjidId, bean.getPassword());
+
+            qrCodes.forEach((key,value) -> {
+                if("true".equals(value)) {
+                    qrCodes.put(key, "false");
+                }
+            });
+
+            return new BaseResponseBean(0, "All QR Codes were disabled Successfully.");
+
+        } catch(BaseException b) {
+
+            return new BaseResponseBean(b.getReasonCode());
+        } catch(Throwable ex) {
+
+            ex.printStackTrace();
+            return new BaseResponseBean(6);
+        }
+    }
+
+    @GetMapping(value = "/getQRCodeStatus", produces = "application/json")
+    public BaseResponseBean getQRCodeStatus(@RequestParam String id) {
+
+        if(id == null || id.isEmpty() || !id.startsWith(QR_CODE_PREFIX)) {
+            return new BaseResponseBean(56);
+        }
+
+        String value = qrCodes.get(id);
+
+        if(value == null || !value.equals("true")) {
+            return new BaseResponseBean(57);
+        }
+
+        return new QRCodeResponseBean(id, "true");
+    }
+
+    @GetMapping(value = "/getAllActiveQRCodes", produces = "application/json")
+    public BaseResponseBean getAllActiveQRCodes() {
+
+        List<QRCodeResponseBean> returnList = new ArrayList<QRCodeResponseBean>();
+        qrCodes.forEach((key,value) -> {
+            if("true".equals(value)) {
+                returnList.add(new QRCodeResponseBean(key, value));
+            }
+        });
+
+        return new AllQRCodesResponseBean(returnList);
+    }
+
+    @GetMapping(value = "/getAndDisableQRCodeStatus", produces = "application/json")
+    public BaseResponseBean getAndDisableQRCodeStatus(@RequestParam String id) {
+
+        if(id == null || id.isEmpty() || !id.startsWith(QR_CODE_PREFIX)) {
+            return new BaseResponseBean(56);
+        }
+
+        String value = qrCodes.get(id);
+
+        if(value == null || !value.equals("true")) {
+            return new BaseResponseBean(57);
+        }
+
+        new Thread(){
+            public void run() {
+                sendQRCodeRedeemedEmail(id);
+            }
+        }.start();
+        qrCodes.put(id, "false");
+        return new QRCodeResponseBean(id, "true");
+    }
+
+    private void sendQRCodeRedeemedEmail(String id) {
+        StringBuilder builder = new StringBuilder("<html>\n");
+        builder.append("QR Code: ").append(id).append("<br>")
+                .append("Date & Time: ").append(DateUtil.formatTime(new Date())).append("<br>");
+        EmailUtil.sendEMail("QR Code Redeemed", builder.toString());
     }
 }

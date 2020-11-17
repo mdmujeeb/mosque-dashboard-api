@@ -66,6 +66,7 @@ public abstract class Errors {
 		errorMap.put(55, "Vehicle Id is required for Full Tank Order.");
 		errorMap.put(56, "Invalid QR Code.");
 		errorMap.put(57, "QR Code is disabled.");
+		errorMap.put(58, "This QR Code was redeemed within last 7 days.");
 	}
 	
 	public static String getErrorDescription(int errorCode) {

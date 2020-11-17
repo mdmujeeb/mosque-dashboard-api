@@ -417,6 +417,7 @@ public class MosqueDashboardController {
     /***************************** Sadaqa Related Methods *****************************/
     public static final String QR_CODE_PREFIX = "MOHAMMAD.MUJEEB@GMAIL.COM@";
     private static Map<String,String> qrCodes = new HashMap<String,String>();
+    private static Map<String,Date> lastRedeemedTimestamps = new HashMap<String,Date>();
 
     @PostMapping(value = "/enableQRCode", consumes = "application/json", produces="application/json")
     public BaseResponseBean enableQRCode(@RequestBody QRCodeUpdateRequestBean bean) {
@@ -435,8 +436,17 @@ public class MosqueDashboardController {
             boolean isEnable = "true".equalsIgnoreCase(bean.getEnable());
 
             if(isEnable) {
+                Date lastRedeemed = lastRedeemedTimestamps.get(bean.getQrCode());
+                if(lastRedeemed != null) {
+                    Date validFutureDate = DateUtil.addDaysToDate(lastRedeemed, 7); // Minimum duration of 7 days between redemptions
+                    validFutureDate = DateUtil.addHoursToDate(lastRedeemed, -3);    // Tolerance of 3 hours
+                    if(new Date().compareTo(validFutureDate) < 0) {
+                        return new BaseResponseBean(58);
+                    }
+                }
                 qrCodes.put(bean.getQrCode(), "true");
             } else {
+                lastRedeemedTimestamps.put(bean.getQrCode(), new Date());
                 qrCodes.put(bean.getQrCode(), "false");
             }
 
@@ -497,7 +507,8 @@ public class MosqueDashboardController {
             return new BaseResponseBean(57);
         }
 
-        return new QRCodeResponseBean(id, "true");
+        Date lastRedeemed = lastRedeemedTimestamps.get(id);
+        return new QRCodeResponseBean(id, "true", lastRedeemed == null ? null : DateUtil.formatTime(lastRedeemed));
     }
 
     @GetMapping(value = "/getAllActiveQRCodes", produces = "application/json")
@@ -506,7 +517,8 @@ public class MosqueDashboardController {
         List<QRCodeResponseBean> returnList = new ArrayList<QRCodeResponseBean>();
         qrCodes.forEach((key,value) -> {
             if("true".equals(value)) {
-                returnList.add(new QRCodeResponseBean(key, value));
+                Date lastRedeemed = lastRedeemedTimestamps.get(key);
+                returnList.add(new QRCodeResponseBean(key, value, lastRedeemed == null ? null : DateUtil.formatTime(lastRedeemed)));
             }
         });
 
@@ -531,8 +543,10 @@ public class MosqueDashboardController {
                 sendQRCodeRedeemedEmail(id);
             }
         }.start();
+        Date lastRedeemed = new Date();
+        lastRedeemedTimestamps.put(id, lastRedeemed);
         qrCodes.put(id, "false");
-        return new QRCodeResponseBean(id, "true");
+        return new QRCodeResponseBean(id, "true", DateUtil.formatTime(lastRedeemed));
     }
 
     private void sendQRCodeRedeemedEmail(String id) {

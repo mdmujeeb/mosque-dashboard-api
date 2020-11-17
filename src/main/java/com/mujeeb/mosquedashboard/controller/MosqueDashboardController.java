@@ -441,7 +441,9 @@ public class MosqueDashboardController {
                     Date validFutureDate = DateUtil.addDaysToDate(lastRedeemed, 7); // Minimum duration of 7 days between redemptions
                     validFutureDate = DateUtil.addHoursToDate(lastRedeemed, -3);    // Tolerance of 3 hours
                     if(new Date().compareTo(validFutureDate) < 0) {
-                        return new BaseResponseBean(58);
+                        BaseResponseBean response = new BaseResponseBean(58);
+                        response.setDescription("This QR Code was redeemed on " + DateUtil.formatTime(lastRedeemed) + ".");
+                        return response;
                     }
                 }
                 qrCodes.put(bean.getQrCode(), "true");
